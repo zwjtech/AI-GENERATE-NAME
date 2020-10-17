@@ -47,7 +47,7 @@ class GenNameHandler(tornado.web.RequestHandler):
         params = reqParams[0]
         paramsObj = json.loads(params)
 
-        gender = paramsObj["gender"]
+        babyGender = paramsObj["gender"]
         lastName = paramsObj["lastName"]
         source = paramsObj["source"]
         name_ch_count = paramsObj["name_ch_count"]
@@ -59,8 +59,6 @@ class GenNameHandler(tornado.web.RequestHandler):
 
         result = {
             "nameList": [
-                {"name": "晨霞", "sentence": "晨霞出沒弄丹闕，春雨依微自甘泉。"},
-                {"name": "春雨", "sentence": "春雨依微春尚早，長安貴遊愛芳草。"}
             ],
             "retCode": success_code,
             "retMsg": success_msg,
@@ -83,19 +81,19 @@ class GenNameHandler(tornado.web.RequestHandler):
         stroke_number = [0, 200]
 
         # 字数--名字的字数--例：王伟，字数为1
-        character_number = 2
+        character_number = int(name_ch_count)
 
         # 姓--不会影响名字的生成，仅仅影响输出
-        last_name = "张"
+        last_name = lastName
 
         # 允许叠字--例：欢欢，西西
-        replicate = False
+        replicate = bool(duplicate)
         # replicate = True
         # 选择词库
         # 0: "默认", 1: "诗经", 2: "楚辞", 3: "论语",
         # 4: "周易", 5: "唐诗", 6: "宋诗", 7: "宋词"
         # 8: 自定义
-        name_source = 1
+        name_source = int(source)
 
         # 是否筛选名字--仅输出默认库中存在的名字
         name_validate = True
@@ -104,7 +102,7 @@ class GenNameHandler(tornado.web.RequestHandler):
         filter_gender = True
 
         # 性别--男/女--仅当开启名字筛选时有效
-        gender = "女"
+        gender = babyGender
 
         names = list()
         with open("names.txt", "w+", encoding='utf-8') as f:
@@ -127,7 +125,16 @@ class GenNameHandler(tornado.web.RequestHandler):
             print(">>正在输出结果...")
             names.sort()
             for i in names:
-                result["nameList"].append(i)
+                name_list = {
+                    "full_name": last_name + i.first_name,
+                    "first_name":i.first_name,
+                    "gender": i.gender,
+                    "name_length": i.count,
+                    "stroke_number": i.stroke_number,
+                    "source": i.source,
+                    "name_pingyin": i.index
+                }
+                result["nameList"].append(name_list)
                 f.write(last_name + str(i) + "\n")
             print(">>输出完毕，请查看目录中的\"names.txt\"文件")
 
