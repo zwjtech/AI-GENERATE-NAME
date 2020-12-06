@@ -4,6 +4,8 @@ import tornado.ioloop
 import tornado.web
 import json
 from pypinyin import pinyin, lazy_pinyin, Style
+
+from BaseHandler import BaseHandler
 from name_set import get_source
 
 
@@ -27,7 +29,7 @@ def check_character(name, constrain):
             return True
     return False
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(BaseHandler):
     def get(self):
         self.write("Hello, World")
 
@@ -40,7 +42,7 @@ class StoryHandler(tornado.web.RequestHandler):
         self.write("U get story id is " + story_id)
 
 # 取名
-class GenNameHandler(tornado.web.RequestHandler):
+class GenNameHandler(BaseHandler):
     def get(self):
         reqParams = self.get_arguments("json")
         print("reqParams:", reqParams)
@@ -51,7 +53,7 @@ class GenNameHandler(tornado.web.RequestHandler):
         lastName = paramsObj["lastName"]
         source = paramsObj["source"]
         name_ch_count = paramsObj["name_ch_count"]
-        duplicate = paramsObj["replicate"]
+        # duplicate = paramsObj["replicate"]
 
         success_code="000"
         status = "success"
@@ -87,8 +89,8 @@ class GenNameHandler(tornado.web.RequestHandler):
         last_name = lastName
 
         # 允许叠字--例：欢欢，西西
-        replicate = bool(duplicate)
-        # replicate = True
+        # replicate = bool(duplicate)
+        replicate = False
         # 选择词库
         # 0: "默认", 1: "诗经", 2: "楚辞", 3: "论语",
         # 4: "周易", 5: "唐诗", 6: "宋诗", 7: "宋词"
@@ -139,7 +141,7 @@ class GenNameHandler(tornado.web.RequestHandler):
             print(">>输出完毕，请查看目录中的\"names.txt\"文件")
 
         print("response content : ", result)
-        self.write(json.dumps(result))
+        self.write(json.dumps(result).encode("utf8"))
 
 class AddHandler(tornado.web.RequestHandler):
     # 这里可以用get的form信息,也可以直接用curl来post json数据
@@ -151,7 +153,6 @@ class AddHandler(tornado.web.RequestHandler):
         s = res["num1"] + res["num2"]
         self.write(json.dumps({"sum":s}))
 
-
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/story/(sishen[0-9]+)", StoryHandler), # 正则url映射,方便get
@@ -160,5 +161,5 @@ application = tornado.web.Application([
 ])
 
 if __name__ == "__main__":
-    application.listen(8888)
+    application.listen(65331)
     tornado.ioloop.IOLoop.instance().start()
