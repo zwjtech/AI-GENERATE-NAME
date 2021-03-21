@@ -96,6 +96,7 @@ class GenNameHandler(BaseHandler):
         # 4: "周易", 5: "唐诗", 6: "宋诗", 7: "宋词"
         # 8: 自定义
         name_source = int(source)
+        
 
         # 是否筛选名字--仅输出默认库中存在的名字
         name_validate = True
