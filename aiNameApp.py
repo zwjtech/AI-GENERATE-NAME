@@ -41,6 +41,7 @@ class StoryHandler(tornado.web.RequestHandler):
 
         self.write("U get story id is " + story_id)
 
+
 # 取名
 class GenNameHandler(BaseHandler):
     def get(self):
